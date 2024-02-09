@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Графічний редактор</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #canvas {
+            border: 1px solid black;
+            cursor: crosshair;
+        }
+
+        .topMenu {
+            height: 75px;
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+            height: 5%;
+            width: 100%;
+        }
+
+        label {
+            margin-left: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topMenu">
+        <label>Оберіть фігуру:</label>
+        <div>
+            <input type="radio" id="square" name="shape" value="square">
+            <label for="square">Квадрат</label>
+            <input type="radio" id="circle" name="shape" value="circle">
+            <label for="circle">Круг</label>
+            <input type="radio" id="diamond" name="shape" value="diamond">
+            <label for="diamond">Ромб</label>
+            <input type="radio" id="triangle" name="shape" value="triangle">
+            <label for="triangle">Прямокутний трикутник</label>
+            <label for="color">Оберіть колір:</label>
+            <input type="color" id="color">
+        </div>
+
+    </div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let startX, startY, endX, endY;
+
+        function disp() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.onload = disp();
+        window.onresize = disp();
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', endDrawing);
+        canvas.addEventListener('mousemove', draw);
+
+        function startDrawing(event) {
+            isDrawing = true;
+            startX = event.offsetX;
+            startY = event.offsetY;
+        }
+
+        function endDrawing(event) {
+            if (isDrawing) {
+                isDrawing = false;
+                endX = event.offsetX;
+                endY = event.offsetY;
+                drawShape();
+            }
+        }
+
+        function draw(event) {
+            if (!isDrawing) return;
+        }
+
+        function drawShape() {
+            const shape = document.querySelector('input[name="shape"]:checked').value;
+            const color = document.getElementById('color').value;
+
+            ctx.fillStyle = color;
+            if (shape === 'square') {
+                ctx.fillRect(startX, startY, endX - startX, endY - startY);
+            } else if (shape === 'circle') {
+                const radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                ctx.beginPath();
+                ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+                ctx.fill();
+            } else if (shape === 'diamond') {
+                ctx.beginPath();
+                ctx.moveTo(startX, startY + (endY - startY) / 2);
+                ctx.lineTo(startX + (endX - startX) / 2, startY);
+                ctx.lineTo(endX, startY + (endY - startY) / 2);
+                ctx.lineTo(startX + (endX - startX) / 2, endY);
+                ctx.closePath();
+                ctx.fill();
+            } else if (shape === 'triangle') {
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, startY);
+                ctx.lineTo(startX, endY);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+    </script>
+</body>
+
+</html>
